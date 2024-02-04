@@ -1,23 +1,21 @@
 <template>
   <v-app>
+    <v-app-bar app>
+      <v-toolbar-title>usersfrontend</v-toolbar-title>
+    </v-app-bar>
+
     <v-main>
-      <HelloWorld/>
+      <router-view/>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'App',
-
-  components: {
-    HelloWorld,
-  },
-
-  data: () => ({
-    //
-  }),
-}
+};
 </script>
+
+<style>
+/* Estilos adicionales si son necesarios */
+</style>
