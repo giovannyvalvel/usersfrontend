@@ -1,101 +1,80 @@
 <template>
   <v-container>
     <v-row>
-      <v-col class="text-right">
-        <v-btn color="primary" @click="activeDialog = 'add'">Agregar Usuario</v-btn>
+      <v-col>
+        <v-btn color="primary" @click="showUserFormDialog = true">Agregar Usuario</v-btn>
         <v-btn color="secondary" @click="logout">Cerrar Sesión</v-btn>
       </v-col>
     </v-row>
-    <v-data-table
-      :headers="headers"
-      :items="users"
-      :loading="loading"
-      :items-per-page="10"
-      class="elevation-1"
-    >
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-icon small @click="showEditDialog(item)">mdi-pencil</v-icon>
-        <v-icon small @click="showDeleteDialog(item)">mdi-delete</v-icon>
-      </template>
-    </v-data-table>
-
-    <!-- User Add/Edit Dialog -->
-    <UserFormDialog
-      :show-dialog="activeDialog === 'add' || activeDialog === 'edit'"
-      :is-edit-mode="activeDialog === 'edit'"
-      :user-data="selectedUser"
-      @close-dialog="closeDialog"
-      @submit="fetchUsers"
-    ></UserFormDialog>
-
-    <!-- User Delete Confirmation Dialog -->
-    <DeleteConfirmDialog
-      :show-dialog="activeDialog === 'delete'"
-      :user-data="selectedUser"
-      @close-dialog="closeDialog"
-      @submit="fetchUsers"
-    ></DeleteConfirmDialog>
+    <v-row>
+      <v-col>
+        <v-data-table
+          :headers="headers"
+          :items="users"
+          :items-per-page="5"
+          class="elevation-1"
+        >
+          <template v-slot:[`item.actions`]="{ item }">
+            <v-icon small class="mr-2" @click="editUser(item.id)">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="confirmDeleteUser(item.id)">
+              mdi-delete
+            </v-icon>
+          </template>
+        </v-data-table>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
-import UserFormDialog from '@/components/UserFormDialog.vue';
-import DeleteConfirmDialog from '@/components/DeleteConfirmDialog.vue';
 import UserService from '@/services/UserService';
 
 export default {
-  components: {
-    UserFormDialog,
-    DeleteConfirmDialog,
-  },
   data() {
     return {
       users: [],
-      loading: false,
       headers: [
-        { text: 'ID', align: 'start', sortable: false, value: 'id' },
+        { text: 'ID', value: 'id' },
         { text: 'Nombre', value: 'name' },
         { text: 'Email', value: 'email' },
         { text: 'Acciones', value: 'actions', sortable: false },
       ],
-      activeDialog: null,
-      selectedUser: null,
+      showUserFormDialog: false,
+      selectedUserId: null,
     };
   },
   methods: {
     fetchUsers() {
-      this.loading = true;
       UserService.getAllUsers()
         .then(response => {
-          this.users = Array.isArray(response.data) ? response.data : [];
-          this.loading = false;
+          this.users = response.data;
         })
-        .catch(error => {
-          console.error("Error al obtener usuarios:", error);
-          this.users = [];
-          this.loading = false;
-        });
+        .catch(error => console.error("Error al obtener los usuarios:", error));
     },
-    showEditDialog(user) {
-      this.selectedUser = user;
-      this.activeDialog = 'edit';
+    editUser(userId) {
+      this.selectedUserId = userId;
+      this.showUserFormDialog = true;
     },
-    showDeleteDialog(user) {
-      this.selectedUser = user;
-      this.activeDialog = 'delete';
+    confirmDeleteUser(userId) {
+      console.log(userId);
     },
-    closeDialog() {
-      this.activeDialog = null;
-      this.selectedUser = null;
-      this.fetchUsers();
+    deleteUser(userId) {
+      UserService.deleteUser(userId)
+        .then(() => {
+          this.fetchUsers();
+        })
+        .catch(error => console.error("Error al eliminar el usuario:", error));
     },
     logout() {
       UserService.logout();
-      this.$router.push('/');
+      this.$router.replace({ name: 'Login' });
     },
   },
   mounted() {
     this.fetchUsers();
-  },
+    console.log(this.headers);
+  }
 };
 </script>
