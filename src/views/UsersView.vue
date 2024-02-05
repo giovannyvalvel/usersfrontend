@@ -2,10 +2,11 @@
   <v-container>
     <v-row>
       <v-col>
-        <v-btn color="primary" @click="showUserFormDialog = true">Agregar Usuario</v-btn>
+        <v-btn color="primary" @click="addNewUser">Agregar Usuario</v-btn>
         <v-btn color="secondary" @click="logout">Cerrar Sesión</v-btn>
       </v-col>
     </v-row>
+
     <v-row>
       <v-col>
         <v-data-table
@@ -25,13 +26,24 @@
         </v-data-table>
       </v-col>
     </v-row>
+
+    <UserFormDialog
+      v-model="showUserFormDialog"
+      :userToEdit="selectedUser"
+      @user-added="handleUserAdded"
+      @user-updated="handleUserUpdated"
+    />
   </v-container>
 </template>
 
 <script>
 import UserService from '@/services/UserService';
+import UserFormDialog from '@/components/UserFormDialog.vue';
 
 export default {
+  components: {
+    UserFormDialog,
+  },
   data() {
     return {
       users: [],
@@ -43,6 +55,7 @@ export default {
       ],
       showUserFormDialog: false,
       selectedUserId: null,
+      selectedUser: null,
     };
   },
   methods: {
@@ -54,7 +67,17 @@ export default {
         .catch(error => console.error("Error al obtener los usuarios:", error));
     },
     editUser(userId) {
-      this.selectedUserId = userId;
+      const userToEdit = this.users.find(user => user.id === userId);
+
+      if (userToEdit) {
+        this.selectedUserId = userId;
+        this.selectedUser = userToEdit;
+        this.showUserFormDialog = true;
+      }
+    },
+    addNewUser() {
+      this.selectedUserId = null;
+      this.selectedUser = null;
       this.showUserFormDialog = true;
     },
     confirmDeleteUser(userId) {
@@ -70,6 +93,16 @@ export default {
     logout() {
       UserService.logout();
       this.$router.replace({ name: 'Login' });
+    },
+    handleUserAdded() {
+      this.fetchUsers();
+      this.showUserFormDialog = false;
+      console.log("Nuevo usuario agregado");
+    },
+    handleUserUpdated() {
+      this.fetchUsers();
+      this.showUserFormDialog = false;
+      console.log("Usuario actualizado");
     },
   },
   mounted() {
