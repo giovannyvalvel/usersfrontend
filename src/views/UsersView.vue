@@ -107,17 +107,14 @@ export default {
     handleUserAdded() {
       this.fetchUsers();
       this.showUserFormDialog = false;
-      console.log("Nuevo usuario agregado");
     },
     handleUserUpdated() {
       this.fetchUsers();
       this.showUserFormDialog = false;
-      console.log("Usuario actualizado");
     }
   },
   mounted() {
     this.fetchUsers();
-    console.log(this.headers);
   }
 };
 </script>

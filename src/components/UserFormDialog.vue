@@ -93,7 +93,6 @@ export default {
     },
     emitClose() {
       this.$emit('update:modelValue', false);
-      console.log("Dialog closed");
     },
     submitUser() {
       if (this.isEditMode) {
