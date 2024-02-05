@@ -63,7 +63,6 @@ export default {
       ],
       showUserFormDialog: false,
       showConfirmDeleteDialog: false,
-      selectedUserId: null,
       selectedUser: null,
     };
   },
@@ -80,7 +79,6 @@ export default {
       this.showUserFormDialog = true;
     },
     addNewUser() {
-      this.selectedUserId = null;
       this.selectedUser = null;
       this.showUserFormDialog = true;
     },
