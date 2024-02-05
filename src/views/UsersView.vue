@@ -101,7 +101,7 @@ export default {
         });
     },
     logout() {
-      UserService.logout();
+      localStorage.removeItem('userSession');
       this.$router.replace({ name: 'Login' });
     },
     handleUserAdded() {
